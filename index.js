@@ -1,6 +1,9 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const sqlite3 = require('sqlite3').verbose();
+const token = process.env.TOKEN;
+const targetWords = process.env.TARGET_WORD;
+
 
 const client = new Client({
     intents: [
