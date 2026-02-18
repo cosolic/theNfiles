@@ -1,8 +1,3 @@
-const fs = require("fs");
-const wordListPath = require("word-list");
-const englishWords = new Set(
-  fs.readFileSync(wordListPath, "utf8").split("\n")
-);
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const sqlite3 = require('sqlite3').verbose();
@@ -48,36 +43,31 @@ function incrementCount(userId, username, word) {
 
 
 client.on("messageCreate", async message => {
-  if (message.author.bot) return;
+const wordsInMessage = message.content
+  .toLowerCase()
+  .split(/\s+/)
+  .map(w => w.replace(/[^a-z]/g, ""));
 
-  const content = message.content;
+wordsInMessage.forEach(fullWord => {
 
-  const wordsInMessage = message.content
-    .toLowerCase()
-    .split(/\s+/)
-    .map(w => w.replace(/[^a-z]/g, "")); // remove punctuation
+  if (!fullWord) return;
 
-  wordsInMessage.forEach(fullWord => {
+  targetWords.forEach(target => {
 
-    if (!fullWord) return;
+    if (!fullWord.startsWith(target)) return;
 
-    targetWords.forEach(target => {
+    // If the word continues, make sure it's NOT forming a normal word
+    const remainder = fullWord.slice(target.length);
 
-      if (fullWord.includes(target)) {
+    // If remainder starts with a vowel, likely real word (like brush)
+    if (/^[aeiou]/.test(remainder)) return;
 
-        const isRealWord = englishWords.has(fullWord);
-
-        if (!isRealWord) {
-  console.log(`Counted: ${fullWord} (contains ${target})`);
-  incrementCount(message.author.id, message.author.username, target);
-            }
-
-
-      }
-
-    });
+    incrementCount(message.author.id, message.author.username, target);
 
   });
+
+});
+
 
   // Commands
   if (content.startsWith("!count")) {
