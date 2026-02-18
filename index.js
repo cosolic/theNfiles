@@ -47,6 +47,8 @@ function incrementCount(userId, username, word) {
 client.on("messageCreate", async message => {
   if (message.author.bot) return;
 
+  const content = message.content;
+
   const wordsInMessage = message.content
     .toLowerCase()
     .split(/\s+/)
@@ -73,11 +75,9 @@ client.on("messageCreate", async message => {
     });
 
   });
-});
 
-
-    // Commands
-    if (content.startsWith("!count")) {
+  // Commands
+  if (content.startsWith("!count")) {
     const args = content.split(" ");
     const targetWord = args[1];
 
@@ -155,11 +155,11 @@ client.on("messageCreate", async message => {
 }
 
 
-    if (content === "!backfill") {
-        message.reply("Starting full server backfill...");
-        await backfillAllChannels(message.guild);
-        message.reply("Backfill complete.");
-    }
+  if (content === "!backfill") {
+      message.reply("Starting full server backfill...");
+      await backfillAllChannels(message.guild);
+      message.reply("Backfill complete.");
+  }
 });
 
 
