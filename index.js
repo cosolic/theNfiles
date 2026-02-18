@@ -7,7 +7,10 @@ require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const sqlite3 = require('sqlite3').verbose();
 const token = process.env.TOKEN;
-const targetWords = process.env.TARGET_WORD;
+const targetWords = process.env.TARGET_WORD
+  .split(",")
+  .map(w => w.trim().toLowerCase());
+
 
 
 const client = new Client({
@@ -65,10 +68,10 @@ client.on("messageCreate", async message => {
         const isRealWord = englishWords.has(fullWord);
 
         if (!isRealWord) {
-          // Count it
-          console.log(`Counted: ${fullWord} (contains ${target})`);
-          // increment database here
-        }
+  console.log(`Counted: ${fullWord} (contains ${target})`);
+  incrementCount(message.author.id, message.author.username, target);
+            }
+
 
       }
 
@@ -185,13 +188,31 @@ async function backfillAllChannels(guild) {
             messages.forEach(msg => {
                 if (msg.author.bot) return;
 
-                const content = msg.content.toLowerCase();
+                const wordsInMessage = msg.content
+    .toLowerCase()
+    .split(/\s+/)
+    .map(w => w.replace(/[^a-z]/g, ""));
 
-                words.forEach(word => {
-                    if (content.includes(word)) {
-                        incrementCount(msg.author.id, msg.author.username, word);
-                    }
-                });
+wordsInMessage.forEach(fullWord => {
+
+    if (!fullWord) return;
+
+    words.forEach(target => {
+
+        if (fullWord.includes(target)) {
+
+            const isRealWord = englishWords.has(fullWord);
+
+            if (!isRealWord) {
+                incrementCount(msg.author.id, msg.author.username, target);
+            }
+
+        }
+
+    });
+
+});
+
             });
 
             lastId = messages.last().id;
@@ -200,7 +221,6 @@ async function backfillAllChannels(guild) {
 }
 
 
-require('dotenv').config(); // optional; only for local dev
 
 client.login(process.env.TOKEN)
   .then(() => console.log("Bot logged in!"))
