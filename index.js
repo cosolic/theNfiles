@@ -178,4 +178,9 @@ async function backfillAllChannels(guild) {
 }
 
 
-client.login(process.env.TOKEN);
+require('dotenv').config(); // optional; only for local dev
+
+client.login(process.env.TOKEN)
+  .then(() => console.log("Bot logged in!"))
+  .catch(err => console.error("Login failed:", err));
+
