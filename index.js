@@ -1,3 +1,8 @@
+const fs = require("fs");
+const wordListPath = require("word-list");
+const englishWords = new Set(
+  fs.readFileSync(wordListPath, "utf8").split("\n")
+);
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const sqlite3 = require('sqlite3').verbose();
@@ -39,20 +44,37 @@ function incrementCount(userId, username, word) {
 }
 
 
-client.on('messageCreate', async (message) => {
-    if (message.author.bot) return;
+client.on("messageCreate", message => {
+  if (message.author.bot) return;
 
-    const words = process.env.TARGET_WORD
-        .split(',')
-        .map(w => w.trim().toLowerCase());
+  const wordsInMessage = message.content
+    .toLowerCase()
+    .split(/\s+/)
+    .map(w => w.replace(/[^a-z]/g, "")); // remove punctuation
 
-    const content = message.content.toLowerCase();
+  wordsInMessage.forEach(fullWord => {
 
-    words.forEach(word => {
-        if (content.includes(word)) {
-            incrementCount(message.author.id, message.author.username, word);
+    if (!fullWord) return;
+
+    targetWords.forEach(target => {
+
+      if (fullWord.includes(target)) {
+
+        const isRealWord = englishWords.has(fullWord);
+
+        if (!isRealWord) {
+          // Count it
+          console.log(`Counted: ${fullWord} (contains ${target})`);
+          // increment database here
         }
+
+      }
+
     });
+
+  });
+});
+
 
     // Commands
     if (content.startsWith("!count")) {
