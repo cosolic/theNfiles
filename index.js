@@ -61,7 +61,7 @@ function shouldCount(fullWord, target) {
 
   // Block some common “real word” continuations for short targets (bru + sh = brush)
   // You can add more endings here if you find false positives.
-  const blockedRemainders = new Set(["sh", "she", "shes", "shed", "shing", "shes"]);
+  const blockedRemainders = new Set(["ht", "eria", "hness", "ella", "gled", "garded", "gled", "hed", "ra", "hty", "iri", "ras", "re"]);
   if (blockedRemainders.has(remainder)) return false;
 
   // Your previous “vowel remainder” rule (keeps it simple):
