@@ -44,7 +44,7 @@ function incrementCount(userId, username, word) {
 }
 
 
-client.on("messageCreate", message => {
+client.on("messageCreate", async message => {
   if (message.author.bot) return;
 
   const wordsInMessage = message.content
